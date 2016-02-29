@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <objectAnimator
+        android:duration="250"
+        android:propertyName="pathData"
+        android:valueFrom="@string/svg_checkmarkUp"
+        android:valueTo="@string/svg_upvote"
+        android:valueType="pathType"
+        android:repeatMode="reverse" />
+
+</set>
