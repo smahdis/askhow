@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -29,6 +30,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.TypeEvaluator;
+import com.nineoldandroids.animation.ValueAnimator;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.yalantis.phoenix.PullToRefreshView;
 
@@ -101,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                makeJsonArrayRequest();
+//                makeJsonArrayRequest();
+                mymethod();
             }
         });
 
@@ -136,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         });
 
 
+
+
 //        ImageView mArrowImageView = (ImageView) findViewById( R.id.imageView);
 //        Drawable drawable = mArrowImageView.getDrawable();
 //        if (drawable instanceof Animatable) {
@@ -144,6 +151,27 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
 
+    private class AnimatedTextView {
+        private final TextView textView;
+
+        public AnimatedTextView(TextView textView) {this.textView = textView;}
+        public String getText() {return textView.getText().toString();}
+        public void setText(String text) {textView.setText(text);}
+    }
+
+    public void mymethod()
+    {
+
+//        ObjectAnimator.ofObject(new AnimatedTextView((TextView) findViewById(R.id.test)), "Text", new TypeEvaluator<String>() {
+//            @Override
+//            public String evaluate(float fraction, String startValue, String endValue) {
+//                return (fraction < 0.5) ? startValue : endValue;
+//            }
+//        }, "3", "2", "1", "0")
+//                .setDuration(3000L)
+//                .start();
+
+    }
 
     /**
      * Method to make json array request where response starts with [

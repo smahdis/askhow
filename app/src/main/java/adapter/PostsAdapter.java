@@ -5,18 +5,25 @@ package adapter;
  */
 
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +31,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -63,7 +72,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
 
         public ImageView upVote, downVote;
         public ViewGroup parent;
-        public boolean isChecked = false;
+        public boolean voteDown_isChecked;
+
+        public Drawable drawable;
+        AnimatorSet set;
 
         public MyViewHolder(View view) {
             super(view);
@@ -81,6 +93,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
             downVote = (ImageView) view.findViewById(R.id.downvote);
             showMore = (ImageButton) view.findViewById(R.id.show_more);
             parent = (ViewGroup) view.findViewById(R.id.fabCL);
+            voteDown_isChecked = false;
 
 //            year = (TextView) view.findViewById(R.id.year);
 
@@ -253,45 +266,128 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
         }
 
 
-        if(!post.isChecked())
+        if(post.isUpVoteChecked())
         {
-//            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_upvote_to_checkmark));
-            holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_upvote_to_checkmark));
+            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_upvote));
+//            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_downvote_to_checkmark));
         }
-        else
-        {
-//            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_upvote));
-            holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_upvote));
+        else{
+            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_upvote_to_loading));
+//            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_downvote));
         }
+
+//        if(post.isDownVoteChecked())
+//        {
+//            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_downvote));
+//        }
+//        else{
+//            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_downvote_to_checkmark));
+//        }
+
+//
+//        holder.downVote.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                if (!post.isDownVoteChecked()) {
+//                    holder.downVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_downvote_to_checkmark));
+//                    post.setIsDownVoteChecked(true);
+//
+//                } else {
+//                    holder.downVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_downvote));
+//                    post.setIsDownVoteChecked(false);
+//                }
+//
+//
+//                Drawable drawable;
+//                drawable = holder.downVote.getDrawable();
+//
+//                if (drawable instanceof Animatable) {
+//                    if (!(((Animatable) drawable).isRunning()))
+//                        ((Animatable) drawable).start();
+//                }
+//            }
+//        });
 
 
 
         holder.upVote.setOnClickListener(new View.OnClickListener() {
-            int i = 0;
             @Override
             public void onClick(View v) {
 
-                if(!post.isChecked()){
-                    post.setIsChecked(true);
-                    holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_upvote_to_checkmark));
+                if(!post.isUpVoteChecked()){
+                    post.setIsUpVoteChecked(true);
+                    holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_upvote_to_loading));
 
                 }
 
                 else
                 {
-                    post.setIsChecked(false);
-                    holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_upvote));
-
+                    post.setIsUpVoteChecked(false);
+                    holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_loading_to_upvote));
                 }
 
 
-                Drawable drawable;
-                drawable = holder.upVote.getDrawable();
+//                if(post.isDownVoteChecked())
+//                {
+//                    holder.downVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_downvote));
+//                    post.setIsDownVoteChecked(false);
+//                    Drawable drawable1 = holder.downVote.getDrawable();
+//                    if (drawable1 instanceof Animatable) {
+//                        if(!(((Animatable) drawable1).isRunning()))
+//                            ((Animatable) drawable1).start();
+//                    }
+//                }
 
-                if (drawable instanceof Animatable) {
-                    if(!(((Animatable) drawable).isRunning()))
-                        ((Animatable) drawable).start();
+//                Drawable drawable, drawable1;
+
+
+//
+//
+                holder.drawable = holder.upVote.getDrawable();
+
+                if (holder.drawable instanceof Animatable) {
+//                    if(!(((Animatable) holder.drawable).isRunning()))
+                        ((Animatable) holder.drawable).start();
                 }
+
+                ObjectAnimator fadeAnim = ObjectAnimator.ofFloat(holder.upVote, "alpha", 1.0f, 0.5f);
+                fadeAnim.setRepeatMode(ValueAnimator.REVERSE);
+                fadeAnim.setDuration(500);
+                fadeAnim.setRepeatCount(ValueAnimator.INFINITE);
+
+                ObjectAnimator scaleXAnim = ObjectAnimator.ofFloat(holder.upVote, "scaleX", 0.5f, 1.0f);
+                scaleXAnim.setRepeatMode(ValueAnimator.REVERSE);
+                scaleXAnim.setDuration(500);
+                scaleXAnim.setRepeatCount(ValueAnimator.INFINITE);
+
+                ObjectAnimator scaleYAnim = ObjectAnimator.ofFloat(holder.upVote, "scaleY", 0.5f, 1.0f);
+                scaleYAnim.setRepeatMode(ValueAnimator.REVERSE);
+                scaleYAnim.setDuration(500);
+                scaleXAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+                scaleYAnim.setRepeatCount(ValueAnimator.INFINITE);
+
+                holder.upVote.setPivotX(holder.upVote.getHeight() / 2);
+                holder.upVote.setPivotY(holder.upVote.getWidth() / 2);
+
+
+                if(holder.set==null) {
+                    holder.set = new AnimatorSet();
+                    holder.set.play(fadeAnim).with(scaleXAnim).with(scaleYAnim);
+                    holder.set.start();
+                }
+                 else{
+                    holder.set.end();
+                    holder.upVote.setAlpha(1.0f);
+                    holder.upVote.setScaleX(1.0f);
+                    holder.upVote.setScaleY(1.0f);
+                    holder.set=null;
+                }
+
+
+
+
             }
         });
 

@@ -41,8 +41,8 @@ public class Post {
     private String reserved2;
     private String reserved3;
 
-    private boolean isChecked;
-
+    private boolean isUpVoteChecked;
+    private boolean isDownVoteChecked;
 
     public Post() {
     }
@@ -249,17 +249,19 @@ public class Post {
     }
 
 
-    public boolean isChecked() {
-        return isChecked;
+    public boolean isUpVoteChecked() {
+        return isUpVoteChecked;
     }
 
-    public void setIsChecked(boolean isChecked) {
-        this.isChecked = isChecked;
+    public void setIsUpVoteChecked(boolean isUpVoteChecked) {
+        this.isUpVoteChecked = isUpVoteChecked;
     }
 
-    public void toggleCheck() {
-        this.isChecked = !isChecked;
+    public boolean isDownVoteChecked() {
+        return isDownVoteChecked;
     }
 
-
+    public void setIsDownVoteChecked(boolean isDownVoteChecked) {
+        this.isDownVoteChecked = isDownVoteChecked;
+    }
 }

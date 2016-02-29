@@ -183,6 +183,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:id="@+id/upvote"
                 android:layout_gravity="center"
+                android:src="@drawable/vector_loading"
                 app:srcCompat ="@drawable/animated_upvote_to_checkmark"
                 android:layout_margin="5dp"/>
 

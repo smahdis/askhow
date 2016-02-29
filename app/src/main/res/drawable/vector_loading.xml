@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="1024dp"
-    android:width="1024dp"
-    android:viewportHeight="600"
-    android:viewportWidth="600" >
+    android:height="128dp"
+    android:width="128dp"
+    android:viewportHeight="512"
+    android:viewportWidth="512" >
     <group
         android:name="rotationGroup"
-        android:pivotX="512"
-        android:pivotY="512"
+        android:pivotX="256"
+        android:pivotY="256"
         android:rotation="0.0">
 
     <path

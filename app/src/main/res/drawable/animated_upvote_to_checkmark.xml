@@ -6,6 +6,8 @@
         android:name="rotationGroup"
         android:animation="@animator/rotate_a_to_b" />
 
+
+
     <target
         android:name="upvote"
         android:animation="@animator/animator_upvote_to_checkmark" />
