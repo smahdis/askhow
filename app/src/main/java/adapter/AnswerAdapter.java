@@ -148,7 +148,7 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.MyViewHold
     }
 
 
-//    private final DialogInterface.OnClickListener mOnClickListener = new MyOnClickListener();
+//    private final DialogInterface.OnClickListener mOnClickListener = new MyCustomCallBack();
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

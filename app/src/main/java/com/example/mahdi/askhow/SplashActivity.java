@@ -383,10 +383,11 @@ public class SplashActivity extends AppCompatActivity {
                             String Error = jo.getString("error");
                             if(Error.equals("false")) {
                                 String username = jo.getString("username");
+                                int mysql_id = jo.getInt("mysql_id");
                                 String phone = jo.getString("phone");
                                 String token = jo.getString("token");
                                 SessionManager sm = new SessionManager(getApplicationContext());
-                                sm.createLoginSession(username, phone, token);
+                                sm.createLoginSession(username, mysql_id, phone, token);
 //                                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                                 btn_reg.setProgress(100); // set progress to 0 to switch back to normal state
                                 btn_reg.postDelayed(new Runnable() {

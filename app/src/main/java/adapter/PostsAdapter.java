@@ -14,19 +14,27 @@ import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.design.widget.Snackbar;
+import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,16 +48,37 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.mahdi.askhow.R;
+import com.wnafee.vector.MorphButton;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Items.Post;
+import libs.AppController;
 import libs.LetterAvatar;
 import libs.MethodLibs;
+import libs.SessionManager;
 
-public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder>  {
+public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder> {
 
     private List<Post> postList;
     private TypedArray mColors;
@@ -58,8 +87,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
     TextView tag;
     LinearLayout.LayoutParams lp;
     private static ClickListener clickListener;
+    private String urlJsonArry = "http://192.168.42.190/askhow/v1/vote/:";
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView title, desc, poster, date, votesDigit;
         public RelativeLayout postBG;
         public LinearLayout postContent;
@@ -109,7 +139,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             LayoutInflater inflater = LayoutInflater.from(view.getContext());
-            int tags_margin = (int)view.getContext().getResources().getDimension(R.dimen.tags_margin);
+            int tags_margin = (int) view.getContext().getResources().getDimension(R.dimen.tags_margin);
 
 
             for (int i = 0; i < 10; i++) {
@@ -154,7 +184,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
             });//closing the setOnClickListener method
 
 
-
 //            drawable = downVote.getDrawable();
 //            if (drawable instanceof Animatable) {
 //                ((Animatable) drawable).start();
@@ -188,7 +217,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
     }
 
 
-//    private final DialogInterface.OnClickListener mOnClickListener = new MyOnClickListener();
+//    private final DialogInterface.OnClickListener mOnClickListener = new MyCustomCallBack();
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -224,11 +253,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
         final LetterAvatar tileProvider = new LetterAvatar(context);
         Bitmap letterTile;// = tileProvider.getLetterTile(post.getPosterName(), post.getPosterName(), tileSize, tileSize);
 
-        if(Math.abs(post.getPost_mysql_id()) % 8 == Math.abs(post.getPosterName().hashCode()) % 8)
-        {
+        if (Math.abs(post.getPost_mysql_id()) % 8 == Math.abs(post.getPosterName().hashCode()) % 8) {
             letterTile = tileProvider.getLetterTile(post.getPosterName(), post.getPosterName() + post.getPost_mysql_id(), tileSize, tileSize);
-        }
-        else
+        } else
             letterTile = tileProvider.getLetterTile(post.getPosterName(), post.getPosterName(), tileSize, tileSize);
 
 
@@ -246,19 +273,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
         holder.postBG.setBackgroundColor(tColors.getColor(holder.color, Color.BLACK));//pickColor(String.valueOf(post.getPost_mysql_id())));
 
 
-        for (int i = 0; i < 10; i++)
-        {
-            if(i >= holder.tags.size())
+        for (int i = 0; i < 10; i++) {
+            if (i >= holder.tags.size())
                 holder.tvs[i].setVisibility(View.GONE);
-            else{
+            else {
                 holder.tvs[i].setVisibility(View.VISIBLE);
                 holder.tvs[i].setText(holder.tags.get(i));
 //                holder.color2 = (Math.abs(holder.tags.get(i).hashCode())) % 8;
-                if(Math.abs(post.getPost_mysql_id()) % 17 == (Math.abs(holder.tags.get(i).hashCode())) % 8)
-                {
+                if (Math.abs(post.getPost_mysql_id()) % 17 == (Math.abs(holder.tags.get(i).hashCode())) % 8) {
                     holder.color = (Math.abs(holder.tags.get(i).hashCode()) + 1) % 8;
-                }
-                else
+                } else
                     holder.color = Math.abs(holder.tags.get(i).hashCode()) % 8;
 
                 holder.tvs[i].setBackgroundColor(mColors.getColor(holder.color, Color.BLACK));
@@ -266,15 +290,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
         }
 
 
-        if(post.isUpVoteChecked())
-        {
-            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_upvote));
-//            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_downvote_to_checkmark));
-        }
-        else{
-            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_upvote_to_loading));
-//            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_downvote));
-        }
+//        if (post.isUpVoteChecked()) {
+//            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_upvote));
+////            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_downvote_to_checkmark));
+//        } else {
+//            holder.upVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_upvote_to_loading));
+////            holder.downVote.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.animated_checkmark_to_downvote));
+//        }
 
 //        if(post.isDownVoteChecked())
 //        {
@@ -310,118 +332,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
 //            }
 //        });
 
-
-
+//        final AnimatedVectorDrawableCompat d = (AnimatedVectorDrawableCompat) context.getDrawable(R.drawable.animated_upvote_to_checkmark); // Insert your AnimatedVectorDrawable resource identifier
+//        holder.upVote.setImageDrawable(d);
+//        d.registerAnimationCallback(callback);
+//
         holder.upVote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(!post.isUpVoteChecked()){
-                    post.setIsUpVoteChecked(true);
-                    holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_upvote_to_loading));
-
-                }
-
-                else
-                {
-                    post.setIsUpVoteChecked(false);
-                    holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_loading_to_upvote));
-                }
-
-
-//                if(post.isDownVoteChecked())
-//                {
-//                    holder.downVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_downvote));
-//                    post.setIsDownVoteChecked(false);
-//                    Drawable drawable1 = holder.downVote.getDrawable();
-//                    if (drawable1 instanceof Animatable) {
-//                        if(!(((Animatable) drawable1).isRunning()))
-//                            ((Animatable) drawable1).start();
-//                    }
-//                }
-
-//                Drawable drawable, drawable1;
-
-
-//
-//
-                holder.drawable = holder.upVote.getDrawable();
-
-                if (holder.drawable instanceof Animatable) {
-//                    if(!(((Animatable) holder.drawable).isRunning()))
-                        ((Animatable) holder.drawable).start();
-                }
-
-                ObjectAnimator fadeAnim = ObjectAnimator.ofFloat(holder.upVote, "alpha", 1.0f, 0.5f);
-                fadeAnim.setRepeatMode(ValueAnimator.REVERSE);
-                fadeAnim.setDuration(500);
-                fadeAnim.setRepeatCount(ValueAnimator.INFINITE);
-
-                ObjectAnimator scaleXAnim = ObjectAnimator.ofFloat(holder.upVote, "scaleX", 0.5f, 1.0f);
-                scaleXAnim.setRepeatMode(ValueAnimator.REVERSE);
-                scaleXAnim.setDuration(500);
-                scaleXAnim.setRepeatCount(ValueAnimator.INFINITE);
-
-                ObjectAnimator scaleYAnim = ObjectAnimator.ofFloat(holder.upVote, "scaleY", 0.5f, 1.0f);
-                scaleYAnim.setRepeatMode(ValueAnimator.REVERSE);
-                scaleYAnim.setDuration(500);
-                scaleXAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-                scaleYAnim.setRepeatCount(ValueAnimator.INFINITE);
-
-                holder.upVote.setPivotX(holder.upVote.getHeight() / 2);
-                holder.upVote.setPivotY(holder.upVote.getWidth() / 2);
-
-
-                if(holder.set==null) {
-                    holder.set = new AnimatorSet();
-                    holder.set.play(fadeAnim).with(scaleXAnim).with(scaleYAnim);
-                    holder.set.start();
-                }
-                 else{
-                    holder.set.end();
-                    holder.upVote.setAlpha(1.0f);
-                    holder.upVote.setScaleX(1.0f);
-                    holder.upVote.setScaleY(1.0f);
-                    holder.set=null;
-                }
-
-
-
-
+                makeNetworkCall(post.getPost_mysql_id(),1, holder);
+//                if (!d.isRunning())
+//                    d.start();
+//                listener(post, holder);
             }
         });
 
 
-//        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        LinearLayout parent = (LinearLayout) inflater.inflate(R.layout.main, null);
-
-
-
-//        final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
-//
-//        final LetterTileProvider tileProvider = new LetterTileProvider(holder.itemView.getContext());
-//        final Bitmap letterTile = tileProvider.getLetterTile(post.getPostTitle(), post.getPostDesc(), 20, 20);
-//        holder.postBG.setBackground(new BitmapDrawable(res, letterTile));
-//        holder.avatar.setImageBitmap(letterTile);
-
-//        getActionBar().setIcon(new BitmapDrawable(getResources(), letterTile));
-
-//        holder.year.setText(post.getYear());
-
-//        swapView(createMorphableView(R.drawable.animated_vector_upvote, R.drawable.animated_vector_checkmarkup, Color.parseColor("#ffffff"),holder.itemView.getContext()), holder.parent, R.id.upvote);
-//        swapView(createMorphableView(R.drawable.animated_vector_downvote, R.drawable.animated_vector_checkmarkdown, Color.parseColor("#ffffff"),holder.itemView.getContext()), holder.parent, R.id.downvote);
-
-    }
-
-    private int pickColor(String key) {
-        // String.hashCode() is not supposed to change across java versions, so
-        // this should guarantee the same key always maps to the same color
-        final int color = Math.abs(key.hashCode()) % 8;
-        try {
-            return mColors.getColor(color, Color.BLACK);
-        } finally {
-            mColors.recycle();
-        }
     }
 
     @Override
@@ -433,37 +358,95 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
         return postList.get(position);
     }
 
-//    private void swapView(View newView, final ViewGroup vg, int id){
-//        View toRemove = vg.findViewById(id);
-//        vg.removeView(toRemove);
-//        newView.setId(id);
-//        vg.addView(newView, toRemove.getLayoutParams());
-//        ((MorphButton)newView).setState(MorphButton.MorphState.START, true);
-//        ((MorphButton)newView).setOnStateChangedListener(new MorphButton.OnStateChangedListener() {
-//            @Override
-//            public void onStateChanged(MorphButton.MorphState changedTo, boolean isAnimating) {
-//                if(changedTo== MorphButton.MorphState.START)
-//                    (vg.findViewById(R.id.downvote)).setVisibility(View.VISIBLE);
-//                else
-//                    (vg.findViewById(R.id.downvote)).setVisibility(View.GONE);
+//    public void listener(Post post, MyViewHolder holder)
+//    {
+//
+//
+//        if(!post.isUpVoteChecked()){
+//            post.setIsUpVoteChecked(true);
+//            holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_upvote_to_checkmark));
+//            makeNetworkCall(post.getPost_mysql_id(), 1, holder);
+//        }
+//
+//        else
+//        {
+//            post.setIsUpVoteChecked(false);
+//            holder.upVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_upvote));
+//            makeNetworkCall(post.getPost_mysql_id(), 0, holder);
+//        }
+//
+//
+//        if(post.isDownVoteChecked())
+//        {
+//            holder.downVote.setImageDrawable(context.getResources().getDrawable(R.drawable.animated_checkmark_to_downvote));
+//            post.setIsDownVoteChecked(false);
+//            Drawable drawable1 = holder.downVote.getDrawable();
+//            if (drawable1 instanceof Animatable) {
+//                if(!(((Animatable) drawable1).isRunning()))
+//                    ((Animatable) drawable1).start();
 //            }
-//        });
+//        }
 //
-////        View toRemove = vg.findViewById(R.id.upvote);
-////        vg.removeView(toRemove);
-////        newView.setId(R.id.upvote);
-////        vg.addView(newView, toRemove.getLayoutParams());
-//    }
+//        holder.drawable = holder.upVote.getDrawable();
 //
-//    private View createMorphableView(int startDrawable, int endDrawable, int color, Context context){
-//        MorphButton mb = new MorphButton(context);
-//        mb.setForegroundTintList(ColorStateList.valueOf(color));
-//        mb.setForegroundTintMode(PorterDuff.Mode.MULTIPLY);
-//        mb.setBackgroundColor(Color.TRANSPARENT);
-//        mb.setStartDrawable(startDrawable);
-//        mb.setEndDrawable(endDrawable);
-//        mb.setState(MorphButton.MorphState.END,true);
-//        return  mb;
+//        if (holder.drawable instanceof Animatable) {
+//            if(!(((Animatable) holder.drawable).isRunning()))
+//                ((Animatable) holder.drawable).start();
+//        }
 //    }
+
+    public void makeNetworkCall(final int postID, final int vote_type, final ImageView view) {
+        final SessionManager sm = new SessionManager(context);
+        StringRequest sr = new StringRequest(Request.Method.PUT, urlJsonArry + postID , new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("response ok", response.toString());
+                try {
+                    JSONObject json = new JSONObject(response);
+                    String Error = json.getString("error");
+                    if(Error.equals("false"))
+                    {
+                        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(Color.GREEN,
+                                PorterDuff.Mode.SRC_ATOP);
+                        view.setColorFilter(porterDuffColorFilter);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d("error.respsonse", "Error: " + error.getMessage());
+                Log.d("error", ""+error.getMessage()+","+error.toString());
+            }
+        }){
+
+
+
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<> ();
+                params.put("post_id", String.valueOf(postID));
+                params.put("vote_type", String.valueOf(vote_type));
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                headers.put("Accept", "application/json");
+                headers.put("Authorization", sm.getToken());
+                return headers;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(sr);
+    }
 }
 

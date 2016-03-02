@@ -31,6 +31,7 @@ public class SessionManager {
 
 	// User name (make variable public to access from outside)
 	public static final String KEY_USERNAME = "username";
+	public static final String KEY_USER_MYSQL_ID = "user_mysql_id";
 	public static final String KEY_FIRST_NAME = "firstname";
 	public static final String KEY_LAST_NAME = "lastname";
 	public static final String KEY_AVATAR = "avatar";
@@ -58,9 +59,10 @@ public class SessionManager {
 	/**
 	 * Create login session
 	 * */
-	public void createLoginSession(String username, String phone, String token) {
+	public void createLoginSession(String username, int mysql_id,String phone, String token) {
 		editor.putBoolean(IS_LOGGED_IN, true);
 		editor.putString(KEY_USERNAME, username);
+		editor.putInt(KEY_USER_MYSQL_ID, mysql_id);
 		editor.putString(KEY_PHONE, phone);
 		editor.putString(KEY_TOKEN, token);
 		// commit changes
@@ -186,6 +188,9 @@ public class SessionManager {
 //
 	public String getUsername() {
 		return pref.getString(KEY_USERNAME, "");
+	}
+	public int getKeyUserMysqlId() {
+		return pref.getInt(KEY_USER_MYSQL_ID, -1);
 	}
 //
 //	public String getFirstName() {

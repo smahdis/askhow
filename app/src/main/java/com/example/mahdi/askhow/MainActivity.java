@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private ProgressDialog pDialog;
 
 //    private String urlJsonArry = "http://192.168.44.242/askhow/v1/getposts/1/10/-1";
-    private String urlJsonArry = "http://192.168.42.190/askhow/v1/getposts/1/10/-1";
+    private String urlJsonArry = "http://192.168.42.107/askhow/v1/getposts/1/10/-1";
     private static String TAG = MainActivity.class.getSimpleName();
     FloatingActionButton fab;
 

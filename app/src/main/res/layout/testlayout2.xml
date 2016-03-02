@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/show_more"
+                    app:srcCompat="@drawable/show_more"
                     android:layout_alignParentRight="true"
                     android:layout_alignTop="@+id/profilePic"
                     android:layout_alignBottom="@+id/profilePic"
@@ -183,8 +183,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:id="@+id/upvote"
                 android:layout_gravity="center"
-                android:src="@drawable/vector_loading"
-                app:srcCompat ="@drawable/animated_upvote_to_checkmark"
+                app:srcCompat="@drawable/vector_upvote"
                 android:layout_margin="5dp"/>
 
             <TextView
@@ -208,7 +207,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:id="@+id/downvote"
                 android:layout_gravity="center"
-                app:srcCompat ="@drawable/animated_downvote_to_checkmark"
+                app:srcCompat="@drawable/vector_downvote"
                 android:layout_margin="5dp"/>
 
             <!--<ImageButton-->
@@ -218,7 +217,7 @@
             <!--android:layout_weight="1.0"-->
             <!--android:background="?attr/selectableItemBackground"-->
             <!--android:layout_gravity="center"-->
-            <!--android:src = "@drawable/downvote"-->
+            <!--app:srcCompat = "@drawable/downvote"-->
             <!--android:id="@+id/downvote"-->
             <!--android:scaleType="centerInside" />-->
 
